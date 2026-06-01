@@ -1,0 +1,31 @@
+# Core scientific
+numpy==1.26.4
+scipy==1.13.0
+scikit-learn==1.5.0
+joblib==1.4.2
+pandas==2.2.2
+
+# Quantum
+qiskit==2.3.1
+qiskit-ibm-runtime==0.46.1
+qiskit-machine-learning==0.9.0
+qiskit-aer==0.17.2
+
+# Dashboard
+flask==3.0.3
+flask-socketio==5.3.6
+gevent==24.2.1
+gevent-websocket==0.10.1
+
+# Hardware
+smbus2==0.4.3
+spidev==3.6
+
+# Utilities
+python-dotenv==1.0.1
+requests==2.32.3
+pyyaml==6.0.1
+loguru==0.7.2
+schedule==1.2.2
+matplotlib==3.9.0
+seaborn==0.13.2

@@ -1,0 +1,46 @@
+# Secrets — never commit
+.env
+
+# Model artifacts (large binary files)
+models/*.joblib
+models/*.npy
+models/*.pkl
+
+# Keep model info JSON (small, useful for readers)
+!models/model_info.json
+!models/.gitkeep
+
+# Data
+data/*.csv
+data/*.json
+data/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+*.egg-info/
+
+# Graphs (regeneratable — we'll add 2 manually)
+graphs/
+!graphs/.gitkeep
+!graphs/fig3_latency.png
+!graphs/fig5_performance.png
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Symengine build (large)
+~/symengine/

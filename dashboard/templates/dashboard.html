@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QENI — Quantum Edge Neural Inference</title>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+:root{
+  --bg:#060810;--bg2:#0d1117;--bg3:#141c2b;--bg4:#1a2438;
+  --border:#1e2d45;--border2:#243350;
+  --text:#c9d1d9;--text2:#8b949e;--text3:#484f58;
+  --blue:#58a6ff;--blue2:#1f6feb;--blue3:#0d2844;
+  --green:#3fb950;--green2:#0f3d17;
+  --red:#f85149;--red2:#3d0f0d;
+  --amber:#e3b341;--amber2:#3d2c0d;
+  --purple:#bc8cff;--purple2:#1f0d3d;
+  --cyan:#39d0d8;--cyan2:#0d2d3d;
+  --radius:8px;--radius2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;min-height:100vh}
+.mono{font-family:'Space Mono',monospace}
+
+/* HEADER */
+header{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:28px;height:28px;background:linear-gradient(135deg,var(--blue2),var(--purple2));
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:14px;border:1px solid var(--blue2);color:var(--blue);
+}
+.logo-text{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px}
+.logo-sub{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:20px}
+.chip{
+  display:flex;align-items:center;gap:6px;padding:4px 10px;
+  border-radius:20px;border:1px solid var(--border2);background:var(--bg3);
+  font-size:11px;color:var(--text2);font-family:'Space Mono',monospace;
+}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.chip .dot.warn{background:var(--amber);animation:pulse 1.5s infinite}
+.chip .dot.active{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+/* MAIN LAYOUT */
+main{padding:20px 24px;display:flex;flex-direction:column;gap:20px;max-width:1400px;margin:0 auto}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);
+  padding:16px;position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--blue2));
+}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:10px}
+.stat-value{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:6px}
+.stat-card.green{--accent:var(--green)}
+.stat-card.red{--accent:var(--red)}
+.stat-card.purple{--accent:var(--purple)}
+.stat-card.amber{--accent:var(--amber)}
+.stat-card.cyan{--accent:var(--cyan)}
+
+/* UNITS GRID */
+.units-section h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:12px}
+.units-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.unit-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);
+  padding:16px;transition:border-color 0.4s,box-shadow 0.4s;position:relative;overflow:hidden;
+}
+.unit-card.normal{border-color:var(--border)}
+.unit-card.anomaly{
+  border-color:var(--red);
+  box-shadow:0 0 20px rgba(248,81,73,0.15);
+  animation:anomaly-pulse 2s infinite;
+}
+@keyframes anomaly-pulse{0%,100%{box-shadow:0 0 20px rgba(248,81,73,0.15)}50%{box-shadow:0 0 30px rgba(248,81,73,0.3)}}
+.unit-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.unit-id{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--blue)}
+.unit-id span{display:block;font-size:9px;color:var(--text3);margin-top:2px;font-family:'Inter',sans-serif}
+.badge{
+  font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;
+  border-radius:4px;text-transform:uppercase;font-family:'Space Mono',monospace;
+}
+.badge.normal{background:var(--green2);color:var(--green);border:1px solid rgba(63,185,80,0.3)}
+.badge.anomaly{background:var(--red2);color:var(--red);border:1px solid rgba(248,81,73,0.4)}
+.badge.waiting{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+
+.health-bar-wrap{margin-bottom:12px}
+.health-bar-track{height:3px;background:var(--bg3);border-radius:2px;margin-top:4px}
+.health-bar-fill{height:3px;border-radius:2px;transition:width 0.8s,background 0.5s}
+.health-label{display:flex;justify-content:space-between;font-size:9px;color:var(--text3)}
+
+.metrics{display:flex;flex-direction:column;gap:5px}
+.metric{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(30,45,69,0.5)}
+.metric:last-child{border-bottom:none}
+.metric-k{font-size:10px;color:var(--text2)}
+.metric-v{font-family:'Space Mono',monospace;font-size:10px;color:var(--text)}
+.metric-v.hot{color:var(--red)}
+.metric-v.warm{color:var(--amber)}
+.metric-v.ok{color:var(--green)}
+
+.decision-wrap{margin-top:10px}
+.decision-labels{display:flex;justify-content:space-between;font-size:8px;color:var(--text3);margin-bottom:3px}
+.decision-track{height:4px;background:var(--bg3);border-radius:2px;position:relative}
+.decision-center{position:absolute;left:50%;top:-1px;width:1px;height:6px;background:var(--border2)}
+.decision-fill{height:4px;border-radius:2px;transition:width 0.6s,background 0.4s,margin 0.6s}
+
+/* BOTTOM PANELS */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.panel-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.panel-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2)}
+.panel-meta{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace}
+
+/* KERNEL VIS */
+.kernel-panel .panel-body{padding:16px}
+.kernel-bars{display:flex;gap:3px;align-items:flex-end;height:72px;margin-bottom:8px}
+.kbar{
+  flex:1;border-radius:2px 2px 0 0;min-height:2px;
+  transition:height 0.5s cubic-bezier(0.4,0,0.2,1),background 0.3s;
+  cursor:pointer;position:relative;
+}
+.kbar:hover::after{
+  content:attr(data-val);position:absolute;bottom:calc(100% + 4px);left:50%;
+  transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);
+  padding:2px 6px;border-radius:4px;font-size:9px;color:var(--text);white-space:nowrap;
+  font-family:'Space Mono',monospace;pointer-events:none;z-index:10;
+}
+.kernel-info{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace}
+
+/* LOG PANEL */
+.log-body{height:220px;overflow-y:auto;padding:0}
+.log-body::-webkit-scrollbar{width:4px}
+.log-body::-webkit-scrollbar-track{background:transparent}
+.log-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.log-entry{
+  display:grid;grid-template-columns:70px 60px 1fr 60px;gap:8px;
+  padding:6px 16px;border-bottom:1px solid rgba(30,45,69,0.4);
+  font-family:'Space Mono',monospace;font-size:10px;align-items:center;
+}
+.log-entry:hover{background:var(--bg3)}
+.log-time{color:var(--text3)}
+.log-unit{color:var(--blue)}
+.log-msg{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.log-msg.anomaly{color:var(--red)}
+.log-msg.normal{color:var(--green)}
+.log-q{color:var(--purple);text-align:right}
+
+/* PRIVACY BADGE */
+.privacy-badge{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;
+  border-radius:6px;background:rgba(9,79,117,0.15);
+  border:1px solid rgba(57,208,216,0.2);font-size:10px;color:var(--cyan);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">Q</div>
+    <div>
+      <div class="logo-text">QENI</div>
+      <div class="logo-sub">Quantum Edge Neural Inference</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="privacy-badge">
+      🔒 Privacy-preserving · Raw data stays on device
+    </div>
+    <div class="chip"><div class="dot active" id="ibm-dot"></div><span id="ibm-label" class="mono">Backend: —</span></div>
+    <div class="chip"><div class="dot"></div><span class="mono">Raspberry Pi 5</span></div>
+    <div class="chip"><div class="dot"></div><span class="mono" id="uptime-display">00:00:00</span></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card cyan">
+      <div class="stat-label">Total Inferences</div>
+      <div class="stat-value mono" id="stat-total">0</div>
+      <div class="stat-sub">quantum circuits executed</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Anomalies Detected</div>
+      <div class="stat-value mono" id="stat-anomalies" style="color:var(--red)">0</div>
+      <div class="stat-sub" id="stat-rate">0.0% rate</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-label">Avg Quantum Latency</div>
+      <div class="stat-value mono" id="stat-q-latency" style="color:var(--purple)">—</div>
+      <div class="stat-sub">per inference cycle</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">Classical Latency</div>
+      <div class="stat-value mono" id="stat-c-latency" style="color:var(--amber)">—</div>
+      <div class="stat-sub">SVM decision on-device</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Units Online</div>
+      <div class="stat-value mono" id="stat-units" style="color:var(--green)">0/5</div>
+      <div class="stat-sub">robot units monitored</div>
+    </div>
+  </div>
+
+  <!-- Units Grid -->
+  <div class="units-section">
+    <h2>Robot Units — Live Telemetry</h2>
+    <div class="units-grid" id="units-grid"></div>
+  </div>
+
+  <!-- Bottom Panels -->
+  <div class="bottom-row">
+
+    <!-- Kernel Visualisation -->
+    <div class="panel kernel-panel">
+      <div class="panel-header">
+        <span class="panel-title">Quantum Kernel Values — K(x_new, x_train_i)</span>
+        <span class="panel-meta" id="kernel-meta">awaiting inference...</span>
+      </div>
+      <div class="panel-body">
+        <div class="kernel-bars" id="kernel-bars">
+          <div style="color:var(--text3);font-size:11px;align-self:center;width:100%;text-align:center">
+            First inference will populate quantum kernel visualization
+          </div>
+        </div>
+        <div class="kernel-info" id="kernel-info"></div>
+      </div>
+    </div>
+
+    <!-- Inference Log -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Inference Log</span>
+        <span class="panel-meta" id="log-count">0 events</span>
+      </div>
+      <div class="log-body" id="log-body"></div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const socket = io();
+let logCount = 0;
+let unitsOnline = new Set();
+const startTime = new Date();
+
+// ── Init unit cards ──────────────────────────────────────────────
+function initUnits() {
+  const g = document.getElementById('units-grid');
+  for (let i = 1; i <= 5; i++) {
+    g.innerHTML += `
+    <div class="unit-card" id="unit-${i}">
+      <div class="unit-header">
+        <div class="unit-id">UNIT-0${i}<span id="u${i}-mode">initializing</span></div>
+        <div class="badge waiting" id="badge-${i}">WAIT</div>
+      </div>
+      <div class="health-bar-wrap">
+        <div class="health-label"><span>Health</span><span id="u${i}-health">—</span></div>
+        <div class="health-bar-track"><div class="health-bar-fill" id="u${i}-hbar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span class="metric-k">Temperature</span><span class="metric-v" id="u${i}-temp">—</span></div>
+        <div class="metric"><span class="metric-k">Vibration</span><span class="metric-v" id="u${i}-vib">—</span></div>
+        <div class="metric"><span class="metric-k">Current</span><span class="metric-v" id="u${i}-curr">—</span></div>
+        <div class="metric"><span class="metric-k">Decision</span><span class="metric-v mono" id="u${i}-dec">—</span></div>
+        <div class="metric"><span class="metric-k">Confidence</span><span class="metric-v" id="u${i}-conf">—</span></div>
+      </div>
+      <div class="decision-wrap">
+        <div class="decision-labels"><span>NORMAL</span><span>ANOMALY</span></div>
+        <div class="decision-track">
+          <div class="decision-center"></div>
+          <div class="decision-fill" id="u${i}-dbar" style="width:0%;background:var(--purple)"></div>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+// ── Update unit card ─────────────────────────────────────────────
+function updateUnit(r) {
+  const i = r.unit_id;
+  unitsOnline.add(i);
+  document.getElementById('stat-units').textContent = `${unitsOnline.size}/5`;
+
+  const isA = r.prediction === 1;
+  const card = document.getElementById(`unit-${i}`);
+  card.className = `unit-card ${isA ? 'anomaly' : 'normal'}`;
+
+  const badge = document.getElementById(`badge-${i}`);
+  badge.className = `badge ${isA ? 'anomaly' : 'normal'}`;
+  badge.textContent = isA ? 'ANOMALY' : 'NORMAL';
+
+  // Mode label
+  const modeEl = document.getElementById(`u${i}-mode`);
+  if (r.is_injected_anomaly) {
+    modeEl.textContent = 'injected anomaly';
+    modeEl.style.color = 'var(--amber)';
+  } else {
+    modeEl.textContent = isA ? 'fault detected' : 'normal operation';
+    modeEl.style.color = isA ? 'var(--red)' : 'var(--text3)';
+  }
+
+  // Health bar
+  const h = r.health_score;
+  const hbar = document.getElementById(`u${i}-hbar`);
+  hbar.style.width = h + '%';
+  hbar.style.background = h > 70 ? 'var(--green)' : h > 40 ? 'var(--amber)' : 'var(--red)';
+  document.getElementById(`u${i}-health`).textContent = h.toFixed(0) + '%';
+
+  // Metrics
+  const temp = r.temperature_c;
+  const tempEl = document.getElementById(`u${i}-temp`);
+  tempEl.textContent = temp.toFixed(1) + '°C';
+  tempEl.className = 'metric-v mono ' + (temp > 55 ? 'hot' : temp > 44 ? 'warm' : 'ok');
+
+  document.getElementById(`u${i}-vib`).textContent = r.vibration_rms.toFixed(3) + ' m/s²';
+  document.getElementById(`u${i}-curr`).textContent = r.current_a.toFixed(2) + ' A';
+
+  const dec = r.svm_decision;
+  const decEl = document.getElementById(`u${i}-dec`);
+  decEl.textContent = (dec >= 0 ? '+' : '') + dec.toFixed(3);
+  decEl.className = 'metric-v mono ' + (dec > 0 ? 'hot' : 'ok');
+
+  document.getElementById(`u${i}-conf`).textContent = (r.confidence * 100).toFixed(1) + '%';
+
+  // Decision bar — centered at 50%, decision maps from [-2,+2] to [0,100]
+  const pct = Math.min(100, Math.max(0, (dec + 2) / 4 * 100));
+  const bar = document.getElementById(`u${i}-dbar`);
+  if (pct >= 50) {
+    // Anomaly side — grow right from center
+    bar.style.marginLeft = '50%';
+    bar.style.width = (pct - 50) + '%';
+    bar.style.background = 'var(--red)';
+  } else {
+    // Normal side — grow left from center
+    bar.style.marginLeft = pct + '%';
+    bar.style.width = (50 - pct) + '%';
+    bar.style.background = 'var(--green)';
+  }
+}
+
+// ── Kernel visualisation ─────────────────────────────────────────
+function updateKernel(r) {
+  if (!r.kernel_row || !r.kernel_row.length) return;
+  const K = r.kernel_row;
+  const maxK = Math.max(...K, 0.001);
+  const isA = r.prediction === 1;
+
+  const bars = document.getElementById('kernel-bars');
+  bars.innerHTML = K.map((k, idx) => {
+    const h = Math.max(2, Math.round((k / maxK) * 68));
+    let col;
+    if (k > maxK * 0.7) col = isA ? 'var(--red)' : 'var(--green)';
+    else if (k > maxK * 0.3) col = 'var(--purple)';
+    else col = 'var(--bg4)';
+    return `<div class="kbar" style="height:${h}px;background:${col}"
+      data-val="SV${idx}: ${k.toFixed(4)}"></div>`;
+  }).join('');
+
+  document.getElementById('kernel-meta').textContent =
+    `Unit ${r.unit_id} | ${K.length} train pts | max=${maxK.toFixed(4)} mean=${r.kernel_mean.toFixed(4)}`;
+
+  document.getElementById('kernel-info').textContent =
+    `Q-latency: ${r.quantum_latency_sec.toFixed(2)}s | ` +
+    `Classical: ${(r.classical_latency_sec * 1000).toFixed(1)}ms | ` +
+    `Quantum is ${(r.quantum_latency_sec / (r.classical_latency_sec || 0.001)).toFixed(0)}x slower than SVM decision`;
+}
+
+// ── Log entry ────────────────────────────────────────────────────
+function addLog(r) {
+  logCount++;
+  document.getElementById('log-count').textContent = logCount + ' events';
+  const body = document.getElementById('log-body');
+  const t = new Date(r.timestamp).toLocaleTimeString('en-GB', {hour12: false});
+  const isA = r.prediction === 1;
+  const msg = isA
+    ? `⚠ ANOMALY dec=${r.svm_decision > 0 ? '+' : ''}${r.svm_decision.toFixed(3)} conf=${(r.confidence*100).toFixed(0)}%`
+    : `✓ Normal   dec=${r.svm_decision.toFixed(3)} conf=${(r.confidence*100).toFixed(0)}%`;
+
+  const el = document.createElement('div');
+  el.className = 'log-entry';
+  el.innerHTML = `
+    <span class="log-time">${t}</span>
+    <span class="log-unit">UNIT-0${r.unit_id}</span>
+    <span class="log-msg ${isA ? 'anomaly' : 'normal'}">${msg}</span>
+    <span class="log-q">${r.quantum_latency_sec.toFixed(1)}s</span>`;
+  body.insertBefore(el, body.firstChild);
+  if (body.children.length > 300) body.removeChild(body.lastChild);
+}
+
+// ── Stats update ─────────────────────────────────────────────────
+function updateStats(s) {
+  document.getElementById('stat-total').textContent = s.total_inferences;
+  document.getElementById('stat-anomalies').textContent = s.total_anomalies;
+  const rate = s.total_inferences > 0
+    ? ((s.total_anomalies / s.total_inferences) * 100).toFixed(1) + '% rate'
+    : '0.0% rate';
+  document.getElementById('stat-rate').textContent = rate;
+  document.getElementById('stat-q-latency').textContent =
+    s.avg_quantum_latency > 0 ? s.avg_quantum_latency.toFixed(2) + 's' : '—';
+  document.getElementById('stat-c-latency').textContent =
+    s.avg_classical_latency_ms > 0 ? s.avg_classical_latency_ms.toFixed(2) + 'ms' : '—';
+
+  const dot = document.getElementById('ibm-dot');
+  const label = document.getElementById('ibm-label');
+  const active = s.total_inferences > 0;
+  label.textContent = 'Backend: ' + (s.backend || 'Simulator');
+  dot.className = active ? 'dot active' : 'dot warn';
+}
+
+// ── Socket events ────────────────────────────────────────────────
+socket.on('inference_result', r => {
+  updateUnit(r);
+  updateKernel(r);
+  addLog(r);
+});
+socket.on('stats_update', updateStats);
+socket.on('initial_state', d => {
+  if (d.stats) updateStats(d.stats);
+  if (d.latest) Object.values(d.latest).forEach(r => updateUnit(r));
+});
+
+// ── Uptime ───────────────────────────────────────────────────────
+setInterval(() => {
+  const s = Math.floor((new Date() - startTime) / 1000);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sc = s % 60;
+  document.getElementById('uptime-display').textContent =
+    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;
+}, 1000);
+
+initUnits();
+</script>
+</body>
+</html>

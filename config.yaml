@@ -1,0 +1,25 @@
+quantum:
+  backend: "ibm_fez"
+  shots: 2048
+  feature_map_reps: 2
+  n_qubits: 4
+  C: 50.0
+  pauli_terms: ["Z", "ZZ"]
+
+sensors:
+  window_size: 10
+  temperature_i2c_addr: 0x48
+  mpu6050_i2c_addr: 0x68
+  mcp3008_channel: 0
+  anomaly_inject_rate: 0.12
+
+pipeline:
+  inference_interval_sec: 45
+  data_dir: "data/"
+  model_dir: "models/"
+  log_dir: "logs/"
+
+dashboard:
+  host: "0.0.0.0"
+  port: 5000
+  robot_units: 5
