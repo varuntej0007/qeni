@@ -89,7 +89,6 @@ The workflow consists of three layers:
 <p align="center">
   <img src="graphs/fig3_latency.png" width="950">
 </p>
-
 ---
 
 ## 🔬 Core Experimental Finding
