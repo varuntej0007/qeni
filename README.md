@@ -22,7 +22,7 @@ Experimental hybrid quantum-classical infrastructure research platform for edge-
 
 ---
 
-# ⚛️ Overview
+## ⚛️ Overview
 
 QENI is a distributed hybrid quantum-classical machine learning system that connects Raspberry Pi 5 edge infrastructure with real IBM Quantum hardware for anomaly detection and experimental quantum inference workflows.
 
@@ -30,7 +30,7 @@ The platform orchestrates quantum kernel computations on IBM superconducting qua
 
 ---
 
-# 🧠 What QENI Studies
+## 🧠 Research Objectives
 
 QENI was designed as an experimental infrastructure research platform for studying:
 
@@ -40,17 +40,17 @@ QENI was designed as an experimental infrastructure research platform for studyi
 * quantum kernel machine learning
 * infrastructure-aware benchmarking
 * operational latency behavior
-* and distributed quantum execution pipelines
+* distributed quantum execution pipelines
 
 The project focuses on measuring realistic hybrid workflow behavior rather than claiming quantum advantage.
 
 ---
 
-# 🖥️ System Architecture
+## 🖥️ System Architecture
 
 The workflow consists of three layers:
 
-## 🔹 Edge Layer — Raspberry Pi 5
+### 🔹 Edge Layer — Raspberry Pi 5
 
 * Reads telemetry streams
 * Encodes features into quantum rotation angles
@@ -58,14 +58,14 @@ The workflow consists of three layers:
 * Maintains local dashboard and logging
 * Preserves raw sensor privacy
 
-## 🔹 Quantum Cloud Layer — IBM Quantum
+### 🔹 Quantum Cloud Layer — IBM Quantum
 
 * Executes quantum kernel circuits
 * Uses PauliFeatureMap-based feature encoding
 * Computes quantum similarity values
 * Returns kernel rows to the edge device
 
-## 🔹 Inference Layer
+### 🔹 Inference Layer
 
 * Runs SVM decision function locally
 * Generates anomaly predictions
@@ -74,21 +74,25 @@ The workflow consists of three layers:
 
 ---
 
-# 📊 Experimental Results
+## 📊 Experimental Results
 
-## 📈 Performance Summary
+### 📈 Performance Summary
 
-![Performance Summary](graphs/fig5_performance.png)
-
----
-
-## ⚡ Quantum vs Classical Latency
-
-![Latency Profile](graphs/fig3_latency.png)
+<p align="center">
+  <img src="graphs/fig5_performance.png" width="950">
+</p>
 
 ---
 
-# 🔬 Core Experimental Finding
+### ⚡ Quantum vs Classical Latency
+
+<p align="center">
+  <img src="graphs/fig3_latency.png" width="950">
+</p>
+
+---
+
+## 🔬 Core Experimental Finding
 
 One of the most important observations from QENI is the infrastructure latency separation between quantum and classical computation layers.
 
@@ -99,7 +103,7 @@ One of the most important observations from QENI is the infrastructure latency s
 
 This creates an approximately:
 
-# 102,996× latency difference
+# 102,996× quantum-to-classical latency ratio
 
 between local classical inference and cloud quantum kernel execution.
 
@@ -107,9 +111,9 @@ Rather than hiding this overhead, QENI measures and exposes it directly as part 
 
 ---
 
-# 🧪 Machine Learning Pipeline
+## 🧪 Machine Learning Pipeline
 
-## 📡 Sensor Features
+### 📡 Sensor Features
 
 The system currently models:
 
@@ -122,7 +126,7 @@ using multi-unit robot telemetry simulation.
 
 ---
 
-## ⚛️ Quantum Feature Encoding
+### ⚛️ Quantum Feature Encoding
 
 Sensor values are normalized into rotation angles between:
 
@@ -140,7 +144,7 @@ Quantum kernel rows are generated using IBM Quantum hardware.
 
 ---
 
-## 🧠 Classification Pipeline
+### 🧠 Classification Pipeline
 
 A support vector machine with a precomputed quantum kernel performs anomaly classification locally on-device.
 
@@ -148,26 +152,26 @@ The system combines:
 
 * cloud quantum execution
 * edge orchestration
-* and classical inference
+* classical inference
 
 within a single hybrid workflow.
 
 ---
 
-# ⚙️ Hardware & Infrastructure
+## ⚙️ Hardware & Infrastructure
 
-## 🖥️ Edge Hardware
+### 🖥️ Edge Hardware
 
 * Raspberry Pi 5 (8GB)
 * ARM Cortex-A76
 * Raspberry Pi OS (64-bit)
 
-## ⚛️ Quantum Backend
+### ⚛️ Quantum Backend
 
 * IBM Quantum `ibm_marrakesh`
 * 156-qubit superconducting quantum processor
 
-## 🛠️ Software Stack
+### 🛠️ Software Stack
 
 * Python 3.11
 * Qiskit
@@ -179,7 +183,7 @@ within a single hybrid workflow.
 
 ---
 
-# 📉 Current Performance
+## 📉 Current Performance
 
 | Metric                     | Result   |
 | -------------------------- | -------- |
@@ -193,7 +197,7 @@ within a single hybrid workflow.
 
 ---
 
-# 🔍 Research Focus
+## 🔍 Research Focus
 
 QENI is not intended as a production-ready industrial deployment system.
 
@@ -203,13 +207,13 @@ Instead, the platform experimentally studies:
 * hybrid orchestration overhead
 * cloud-QPU execution latency
 * edge-to-quantum workflows
-* and realistic operational constraints of current NISQ systems
+* realistic operational constraints of current NISQ systems
 
 The latency ratio itself is treated as a measurable infrastructure finding rather than a limitation to hide.
 
 ---
 
-# 🚀 Future Directions
+## 🚀 Future Directions
 
 Planned extensions include:
 
@@ -220,11 +224,11 @@ Planned extensions include:
 * cross-backend benchmarking
 * temporal kernel stability analysis
 * distributed edge-node deployments
-* and hybrid cloud-edge optimization workflows
+* hybrid cloud-edge optimization workflows
 
 ---
 
-# 📂 Repository Structure
+## 📂 Repository Structure
 
 ```bash
 qeni/
@@ -241,25 +245,25 @@ qeni/
 
 ---
 
-# ⚠️ Disclaimer
+## ⚠️ Disclaimer
 
 QENI is an experimental research and benchmarking platform intended for:
 
 * infrastructure experimentation
 * educational purposes
 * hybrid systems research
-* and quantum workflow analysis
+* quantum workflow analysis
 
 It is NOT intended for:
 
 * production deployment
 * safety-critical robotics
 * industrial fault prevention
-* or enterprise operational environments
+* enterprise operational environments
 
 ---
 
-# 👨‍💻 Author
+## 👨‍💻 Author
 
 **Miriyala Varun Tej**
 B.Tech CSE (IoT)
